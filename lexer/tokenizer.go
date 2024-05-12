@@ -74,6 +74,8 @@ func (t *Tokenizer) readSymbol() *Token {
 		return NewToken(TOKEN_GREATER, ">")
 	case ';':
 		return NewToken(TOKEN_SEMI, ";")
+	case ':':
+		return NewToken(TOKEN_COLON, ":")
 	case '{':
 		return NewToken(TOKEN_LBRACE, "{")
 	case '}':
@@ -90,6 +92,8 @@ func (t *Tokenizer) readSymbol() *Token {
 		return NewToken(TOKEN_MINUS, "-")
 	case '/':
 		return NewToken(TOKEN_SLASH, "/")
+	case '*':
+		return NewToken(TOKEN_STAR, "*")
 	default:
 		return NewToken(TOKEN_ILLEGAL, string(t.ch))
 	}
@@ -99,6 +103,8 @@ func (t *Tokenizer) readKeyword(name string) *Token {
 	switch name {
 	case "let":
 		return NewToken(TOKEN_LET, "let")
+	case "var":
+		return NewToken(TOKEN_VAR, "var")
 	case "func":
 		return NewToken(TOKEN_FUNC, "func")
 	case "return":

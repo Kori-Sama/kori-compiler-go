@@ -18,17 +18,23 @@ var validTokens = map[string](struct {
 			{TOKEN_SEMI, ";"}},
 	},
 	"Two_Lines": {
-		"let a = 9;\nlet b = 10;",
+		"let a = 9 / 9 - 1;\nlet b = 10 * 2;",
 		[]Token{
 			{TOKEN_LET, "let"},
 			{TOKEN_NAME, "a"},
 			{TOKEN_ASSIGN, "="},
 			{TOKEN_NUMBER, "9"},
+			{TOKEN_SLASH, "/"},
+			{TOKEN_NUMBER, "9"},
+			{TOKEN_MINUS, "-"},
+			{TOKEN_NUMBER, "1"},
 			{TOKEN_SEMI, ";"},
 			{TOKEN_LET, "let"},
 			{TOKEN_NAME, "b"},
 			{TOKEN_ASSIGN, "="},
 			{TOKEN_NUMBER, "10"},
+			{TOKEN_STAR, "*"},
+			{TOKEN_NUMBER, "2"},
 			{TOKEN_SEMI, ";"}},
 	},
 	"Function": {
@@ -79,7 +85,7 @@ var validTokens = map[string](struct {
 			{TOKEN_SEMI, ";"}},
 	},
 	"Token_With_Double_Keywords": {
-		"if true { return; } else if false { return; }",
+		"if true { return; } else if false { return; } else {}",
 		[]Token{
 			{TOKEN_IF, "if"},
 			{TOKEN_TRUE, "true"},
@@ -92,6 +98,9 @@ var validTokens = map[string](struct {
 			{TOKEN_LBRACE, "{"},
 			{TOKEN_RETURN, "return"},
 			{TOKEN_SEMI, ";"},
+			{TOKEN_RBRACE, "}"},
+			{TOKEN_ELSE, "else"},
+			{TOKEN_LBRACE, "{"},
 			{TOKEN_RBRACE, "}"}},
 	},
 }
