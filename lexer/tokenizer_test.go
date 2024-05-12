@@ -11,72 +11,88 @@ var validTokens = map[string](struct {
 	"One_Line": {
 		"let a = 9;",
 		[]Token{
-			{NAME, "let"},
-			{NAME, "a"},
-			{ASSIGN, "="},
-			{NUMBER, "9"},
-			{SEMI, ";"}},
+			{TOKEN_LET, "let"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_ASSIGN, "="},
+			{TOKEN_NUMBER, "9"},
+			{TOKEN_SEMI, ";"}},
 	},
 	"Two_Lines": {
 		"let a = 9;\nlet b = 10;",
 		[]Token{
-			{NAME, "let"},
-			{NAME, "a"},
-			{ASSIGN, "="},
-			{NUMBER, "9"},
-			{SEMI, ";"},
-			{NAME, "let"},
-			{NAME, "b"},
-			{ASSIGN, "="},
-			{NUMBER, "10"},
-			{SEMI, ";"}},
+			{TOKEN_LET, "let"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_ASSIGN, "="},
+			{TOKEN_NUMBER, "9"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_LET, "let"},
+			{TOKEN_NAME, "b"},
+			{TOKEN_ASSIGN, "="},
+			{TOKEN_NUMBER, "10"},
+			{TOKEN_SEMI, ";"}},
 	},
 	"Function": {
 		"func add(a, b) {\n    return a + b;\n}",
 		[]Token{
-			{NAME, "func"},
-			{NAME, "add"},
-			{LPAREN, "("},
-			{NAME, "a"},
-			{COMMA, ","},
-			{NAME, "b"},
-			{RPAREN, ")"},
-			{LBRACE, "{"},
-			{NAME, "return"},
-			{NAME, "a"},
-			{PLUS, "+"},
-			{NAME, "b"},
-			{SEMI, ";"},
-			{RBRACE, "}"}},
+			{TOKEN_FUNC, "func"},
+			{TOKEN_NAME, "add"},
+			{TOKEN_LPAREN, "("},
+			{TOKEN_NAME, "a"},
+			{TOKEN_COMMA, ","},
+			{TOKEN_NAME, "b"},
+			{TOKEN_RPAREN, ")"},
+			{TOKEN_LBRACE, "{"},
+			{TOKEN_RETURN, "return"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_PLUS, "+"},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_RBRACE, "}"}},
 	},
 
-	"Comparisons": {
+	"Token_With_Double_Operators": {
 		"a == b; a <= b; a >= b; a !=b; a < b; a > b;",
 		[]Token{
-			{NAME, "a"},
-			{EQ, "=="},
-			{NAME, "b"},
-			{SEMI, ";"},
-			{NAME, "a"},
-			{LESS_EQ, "<="},
-			{NAME, "b"},
-			{SEMI, ";"},
-			{NAME, "a"},
-			{GREATER_EQ, ">="},
-			{NAME, "b"},
-			{SEMI, ";"},
-			{NAME, "a"},
-			{NOT_EQ, "!="},
-			{NAME, "b"},
-			{SEMI, ";"},
-			{NAME, "a"},
-			{LESS, "<"},
-			{NAME, "b"},
-			{SEMI, ";"},
-			{NAME, "a"},
-			{GREATER, ">"},
-			{NAME, "b"},
-			{SEMI, ";"}},
+			{TOKEN_NAME, "a"},
+			{TOKEN_EQ, "=="},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_LESS_EQ, "<="},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_GREATER_EQ, ">="},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_NOT_EQ, "!="},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_LESS, "<"},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_NAME, "a"},
+			{TOKEN_GREATER, ">"},
+			{TOKEN_NAME, "b"},
+			{TOKEN_SEMI, ";"}},
+	},
+	"Token_With_Double_Keywords": {
+		"if true { return; } else if false { return; }",
+		[]Token{
+			{TOKEN_IF, "if"},
+			{TOKEN_TRUE, "true"},
+			{TOKEN_LBRACE, "{"},
+			{TOKEN_RETURN, "return"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_RBRACE, "}"},
+			{TOKEN_ELSE_IF, "else if"},
+			{TOKEN_FALSE, "false"},
+			{TOKEN_LBRACE, "{"},
+			{TOKEN_RETURN, "return"},
+			{TOKEN_SEMI, ";"},
+			{TOKEN_RBRACE, "}"}},
 	},
 }
 
@@ -87,8 +103,8 @@ func TestNextToken(t *testing.T) {
 
 			for _, expected := range test.tok {
 				token := tok.Next()
-				if token.Type != expected.Type {
-					t.Errorf("Expected %s, got %s", expected.Type, token.Type)
+				if token.Kind != expected.Kind {
+					t.Errorf("Expected %s, got %s", expected.Kind, token.Kind)
 				}
 				if token.Literal != expected.Literal {
 					t.Errorf("Expected %s, got %s", expected.Literal, token.Literal)
@@ -99,8 +115,8 @@ func TestNextToken(t *testing.T) {
 }
 
 var invalidTokensMap = map[string]TokenizerError{
-	"let a = 9; !":   {Message: "Illegal character", Line: 1, Location: 12},
-	"let a = 9;\n !": {Message: "Illegal character", Line: 2, Location: 2},
+	"let a = 9; !":   {Message: "Illegal character", Line: 0, Location: 11},
+	"let a = 9;\n !": {Message: "Illegal character", Line: 1, Location: 1},
 }
 
 func TestNextTokenError(t *testing.T) {
@@ -109,7 +125,7 @@ func TestNextTokenError(t *testing.T) {
 
 		for {
 			token := tok.Next()
-			if token.Type == ILLEGAL || token.Type == EOF {
+			if token.Kind == TOKEN_ILLEGAL || token.Kind == TOKEN_EOF {
 				break
 			}
 		}

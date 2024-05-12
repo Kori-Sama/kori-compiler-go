@@ -18,7 +18,7 @@ func NewTokenizer(content *string) *Tokenizer {
 		Err:     nil,
 		content: content,
 		current: 0,
-		line:    1,
+		line:    0,
 		linePos: 0,
 	}
 }
@@ -27,7 +27,7 @@ func (t *Tokenizer) Next() *Token {
 	text := t.content
 
 	if t.current >= len(*text) {
-		return NewToken(EOF, "")
+		return NewToken(TOKEN_EOF, "")
 	}
 
 	t.ch = (*text)[t.current]
@@ -43,36 +43,10 @@ func (t *Tokenizer) Next() *Token {
 	}
 
 	token := t.readSymbol()
-	if token.Type == ILLEGAL {
+	if token.Kind == TOKEN_ILLEGAL {
 		t.Err = NewTokenizerError("Illegal character", t.line, t.current-t.linePos)
 	}
 	return token
-}
-
-func (t *Tokenizer) PeekToken() *Token {
-	current := t.current
-	token := t.Next()
-	t.current = current
-	return token
-}
-
-func (t *Tokenizer) SkipWhitespace() {
-	text := t.content
-
-	for t.current < len(*text) {
-		ch := (*text)[t.current]
-		if !isWhitespace(ch) {
-			break
-		}
-
-		if ch == '\n' {
-			t.line++
-			t.linePos = t.current + 1
-		}
-
-		t.current++
-	}
-	t.ch = (*text)[t.current]
 }
 
 func (t *Tokenizer) readSymbol() *Token {
@@ -80,57 +54,71 @@ func (t *Tokenizer) readSymbol() *Token {
 	switch t.ch {
 	case '=':
 		if t.peekChar('=') {
-			return NewToken(EQ, "==")
+			return NewToken(TOKEN_EQ, "==")
 		}
-		return NewToken(ASSIGN, "=")
+		return NewToken(TOKEN_ASSIGN, "=")
 	case '!':
 		if t.peekChar('=') {
-			return NewToken(NOT_EQ, "!=")
+			return NewToken(TOKEN_NOT_EQ, "!=")
 		}
-		return NewToken(BANG, "!")
+		return NewToken(TOKEN_BANG, "!")
 	case '<':
 		if t.peekChar('=') {
-			return NewToken(LESS_EQ, "<=")
+			return NewToken(TOKEN_LESS_EQ, "<=")
 		}
-		return NewToken(LESS, "<")
+		return NewToken(TOKEN_LESS, "<")
 	case '>':
 		if t.peekChar('=') {
-			return NewToken(GREATER_EQ, ">=")
+			return NewToken(TOKEN_GREATER_EQ, ">=")
 		}
-		return NewToken(GREATER, ">")
+		return NewToken(TOKEN_GREATER, ">")
 	case ';':
-		return NewToken(SEMI, ";")
+		return NewToken(TOKEN_SEMI, ";")
 	case '{':
-		return NewToken(LBRACE, "{")
+		return NewToken(TOKEN_LBRACE, "{")
 	case '}':
-		return NewToken(RBRACE, "}")
+		return NewToken(TOKEN_RBRACE, "}")
 	case '(':
-		return NewToken(LPAREN, "(")
+		return NewToken(TOKEN_LPAREN, "(")
 	case ')':
-		return NewToken(RPAREN, ")")
+		return NewToken(TOKEN_RPAREN, ")")
 	case ',':
-		return NewToken(COMMA, ",")
+		return NewToken(TOKEN_COMMA, ",")
 	case '+':
-		return NewToken(PLUS, "+")
+		return NewToken(TOKEN_PLUS, "+")
 	case '-':
-		return NewToken(MINUS, "-")
+		return NewToken(TOKEN_MINUS, "-")
 	case '/':
-		return NewToken(SLASH, "/")
+		return NewToken(TOKEN_SLASH, "/")
 	default:
-		return NewToken(ILLEGAL, string(t.ch))
+		return NewToken(TOKEN_ILLEGAL, string(t.ch))
 	}
 }
 
-func (t *Tokenizer) peekChar(expect byte) bool {
-	if t.current >= len(*t.content) {
-		return false
+func (t *Tokenizer) readKeyword(name string) *Token {
+	switch name {
+	case "let":
+		return NewToken(TOKEN_LET, "let")
+	case "func":
+		return NewToken(TOKEN_FUNC, "func")
+	case "return":
+		return NewToken(TOKEN_RETURN, "return")
+	case "if":
+		return NewToken(TOKEN_IF, "if")
+	case "else":
+		if t.PeekToken(TOKEN_IF) {
+			return NewToken(TOKEN_ELSE_IF, "else if")
+		}
+		return NewToken(TOKEN_ELSE, "else")
+	case "true":
+		return NewToken(TOKEN_TRUE, "true")
+	case "false":
+		return NewToken(TOKEN_FALSE, "false")
+	case "for":
+		return NewToken(TOKEN_FOR, "for")
+	default:
+		return nil
 	}
-	ch := (*t.content)[t.current]
-	if ch != expect {
-		return false
-	}
-	t.current++
-	return true
 }
 
 func (t *Tokenizer) readName() *Token {
@@ -144,7 +132,14 @@ func (t *Tokenizer) readName() *Token {
 		}
 		t.current++
 	}
-	return NewToken(NAME, (*text)[start:t.current])
+
+	name := (*text)[start:t.current]
+
+	if keywordToken := t.readKeyword(name); keywordToken != nil {
+		return keywordToken
+	}
+
+	return NewToken(TOKEN_NAME, name)
 }
 
 func (t *Tokenizer) readNumber() *Token {
@@ -158,7 +153,48 @@ func (t *Tokenizer) readNumber() *Token {
 		}
 		t.current++
 	}
-	return NewToken(NUMBER, (*text)[start:t.current])
+	return NewToken(TOKEN_NUMBER, (*text)[start:t.current])
+}
+
+func (t *Tokenizer) SkipWhitespace() {
+	text := t.content
+
+	for t.current < len(*text) {
+		ch := (*text)[t.current]
+		if !isWhitespace(ch) {
+			break
+		}
+
+		if ch == '\n' {
+			t.line++
+			t.linePos = t.current
+		}
+
+		t.current++
+	}
+	t.ch = (*text)[t.current]
+}
+
+func (t *Tokenizer) PeekToken(expect TokenKind) bool {
+	start := t.current
+	token := t.Next()
+	if token.Kind != expect {
+		t.current = start
+		return false
+	}
+	return true
+}
+
+func (t *Tokenizer) peekChar(expect byte) bool {
+	if t.current >= len(*t.content) {
+		return false
+	}
+	ch := (*t.content)[t.current]
+	if ch != expect {
+		return false
+	}
+	t.current++
+	return true
 }
 
 func isLetter(ch byte) bool {

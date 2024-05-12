@@ -32,5 +32,5 @@ func NewTokenizerError(message string, line, location int) *TokenizerError {
 }
 
 func (e *TokenizerError) Error() string {
-	return fmt.Sprintf(red+"ERROR: Unexpected character: %s at line %d, location %d"+reset, e.Message, e.Line, e.Location)
+	return fmt.Sprintf(red+"ERROR: Unexpected character: %s at line %d, location %d"+reset, e.Message, e.Line+1, e.Location+1)
 }

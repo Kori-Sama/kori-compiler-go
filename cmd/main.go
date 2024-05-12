@@ -26,7 +26,7 @@ func main() {
 	for {
 		token := tokenizer.Next()
 		tokens = append(tokens, *token)
-		if token.Type == lexer.EOF || token.Type == lexer.ILLEGAL {
+		if token.Kind == lexer.TOKEN_EOF || token.Kind == lexer.TOKEN_ILLEGAL {
 			break
 		}
 	}
@@ -38,7 +38,7 @@ func main() {
 
 	output := ""
 	for _, token := range tokens {
-		output += fmt.Sprintf("%v: %s\n", token.Type, token.Literal)
+		output += fmt.Sprintf("%v: %s\n", token.Kind, token.Literal)
 	}
 
 	fmt.Print(output)
