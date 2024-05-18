@@ -21,6 +21,8 @@ const (
 	TOKEN_RBRACE
 	TOKEN_LPAREN
 	TOKEN_RPAREN
+	TOKEN_LBRACKET
+	TOKEN_RBRACKET
 	TOKEN_COMMA
 	TOKEN_PLUS
 	TOKEN_MINUS
@@ -41,8 +43,10 @@ const (
 )
 
 type Token struct {
-	Kind    TokenKind
-	Literal string
+	Kind     TokenKind
+	Literal  string
+	Line     int
+	Location int
 }
 
 func NewToken(kind TokenKind, literal string) *Token {
@@ -86,6 +90,8 @@ var tokenNamesMap = map[TokenKind]string{
 	TOKEN_RBRACE:     "RBRACE",
 	TOKEN_LPAREN:     "LPAREN",
 	TOKEN_RPAREN:     "RPAREN",
+	TOKEN_LBRACKET:   "LBRACKET",
+	TOKEN_RBRACKET:   "RBRACKET",
 	TOKEN_COMMA:      "COMMA",
 	TOKEN_PLUS:       "PLUS",
 	TOKEN_MINUS:      "MINUS",

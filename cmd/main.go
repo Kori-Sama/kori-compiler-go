@@ -20,19 +20,12 @@ func main() {
 
 	input := read_file(inputPath)
 
-	tokenizer := lexer.NewTokenizer(input)
-	var tokens []lexer.Token
+	lexer := lexer.NewLexer(input)
 
-	for {
-		token := tokenizer.Next()
-		tokens = append(tokens, *token)
-		if token.Kind == lexer.TOKEN_EOF || token.Kind == lexer.TOKEN_ILLEGAL {
-			break
-		}
-	}
+	tokens := lexer.ParseAll()
 
-	if tokenizer.Err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", tokenizer.Err)
+	if lexer.Err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", lexer.Err)
 		os.Exit(1)
 	}
 

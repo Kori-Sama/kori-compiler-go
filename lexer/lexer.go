@@ -1,11 +1,9 @@
 package lexer
 
-type ITokenizer interface {
-	Next() *Token
-}
+import "github.com/Kori-Sama/compiler-go/cerr"
 
-type Tokenizer struct {
-	Err     *TokenizerError
+type Lexer struct {
+	Err     *cerr.LexerError
 	content *string
 	current int
 	line    int
@@ -13,8 +11,8 @@ type Tokenizer struct {
 	ch      byte
 }
 
-func NewTokenizer(content *string) *Tokenizer {
-	return &Tokenizer{
+func NewLexer(content *string) *Lexer {
+	return &Lexer{
 		Err:     nil,
 		content: content,
 		current: 0,
@@ -23,52 +21,74 @@ func NewTokenizer(content *string) *Tokenizer {
 	}
 }
 
-func (t *Tokenizer) Next() *Token {
-	text := t.content
+func (l *Lexer) ParseAll() []*Token {
+	tokens := make([]*Token, 0)
 
-	if t.current >= len(*text) {
-		return NewToken(TOKEN_EOF, "")
-	}
-
-	t.ch = (*text)[t.current]
-	if isWhitespace(t.ch) {
-		t.SkipWhitespace()
-	}
-
-	if isLetter(t.ch) {
-		return t.readName()
-	}
-	if isDigit(t.ch) {
-		return t.readNumber()
+	for {
+		token := l.Next()
+		tokens = append(tokens, token)
+		if token.Kind == TOKEN_EOF || token.Kind == TOKEN_ILLEGAL {
+			break
+		}
 	}
 
-	token := t.readSymbol()
-	if token.Kind == TOKEN_ILLEGAL {
-		t.Err = NewTokenizerError("Illegal character", t.line, t.current-t.linePos)
+	return tokens
+}
+
+func (l *Lexer) Next() *Token {
+	text := l.content
+
+	var token *Token
+
+	if l.current >= len(*text) {
+		token = NewToken(TOKEN_EOF, "")
+		return token
 	}
+
+	l.ch = (*text)[l.current]
+	if isWhitespace(l.ch) {
+		l.SkipWhitespace()
+	}
+
+	line := l.line
+	pos := l.current - l.linePos
+
+	if isLetter(l.ch) {
+		token = l.readName()
+	} else if isDigit(l.ch) {
+		token = l.readNumber()
+	} else {
+		token = l.readSymbol()
+		if token.Kind == TOKEN_ILLEGAL {
+			l.Err = cerr.NewLexerError("Illegal character", l.line, l.current-l.linePos)
+		}
+	}
+
+	token.Line = line
+	token.Location = pos
 	return token
 }
 
-func (t *Tokenizer) readSymbol() *Token {
-	t.current++
-	switch t.ch {
+func (l *Lexer) readSymbol() *Token {
+	l.current++
+	switch l.ch {
 	case '=':
-		if t.peekChar('=') {
+		if l.peekChar('=') {
 			return NewToken(TOKEN_EQ, "==")
 		}
 		return NewToken(TOKEN_ASSIGN, "=")
 	case '!':
-		if t.peekChar('=') {
+		if l.peekChar('=') {
 			return NewToken(TOKEN_NOT_EQ, "!=")
 		}
 		return NewToken(TOKEN_BANG, "!")
 	case '<':
-		if t.peekChar('=') {
+		if l.peekChar('=') {
 			return NewToken(TOKEN_LESS_EQ, "<=")
 		}
 		return NewToken(TOKEN_LESS, "<")
 	case '>':
-		if t.peekChar('=') {
+		if l.peekChar('=') {
 			return NewToken(TOKEN_GREATER_EQ, ">=")
 		}
 		return NewToken(TOKEN_GREATER, ">")
@@ -80,6 +100,10 @@ func (t *Tokenizer) readSymbol() *Token {
 		return NewToken(TOKEN_LBRACE, "{")
 	case '}':
 		return NewToken(TOKEN_RBRACE, "}")
+	case '[':
+		return NewToken(TOKEN_LBRACKET, "[")
+	case ']':
+		return NewToken(TOKEN_RBRACKET, "]")
 	case '(':
 		return NewToken(TOKEN_LPAREN, "(")
 	case ')':
@@ -95,11 +119,11 @@ func (t *Tokenizer) readSymbol() *Token {
 	case '*':
 		return NewToken(TOKEN_STAR, "*")
 	default:
-		return NewToken(TOKEN_ILLEGAL, string(t.ch))
+		return NewToken(TOKEN_ILLEGAL, string(l.ch))
 	}
 }
 
-func (t *Tokenizer) readKeyword(name string) *Token {
+func (l *Lexer) readKeyword(name string) *Token {
 	switch name {
 	case "let":
 		return NewToken(TOKEN_LET, "let")
@@ -112,7 +136,7 @@ func (t *Tokenizer) readKeyword(name string) *Token {
 	case "if":
 		return NewToken(TOKEN_IF, "if")
 	case "else":
-		if t.PeekToken(TOKEN_IF) {
+		if l.PeekToken(TOKEN_IF) {
 			return NewToken(TOKEN_ELSE_IF, "else if")
 		}
 		return NewToken(TOKEN_ELSE, "else")
@@ -127,79 +151,79 @@ func (t *Tokenizer) readKeyword(name string) *Token {
 	}
 }
 
-func (t *Tokenizer) readName() *Token {
-	text := t.content
-	start := t.current
+func (l *Lexer) readName() *Token {
+	text := l.content
+	start := l.current
 
-	for t.current < len(*text) {
-		ch := (*text)[t.current]
+	for l.current < len(*text) {
+		ch := (*text)[l.current]
 		if !isLetter(ch) {
 			break
 		}
-		t.current++
+		l.current++
 	}
 
-	name := (*text)[start:t.current]
+	name := (*text)[start:l.current]
 
-	if keywordToken := t.readKeyword(name); keywordToken != nil {
+	if keywordToken := l.readKeyword(name); keywordToken != nil {
 		return keywordToken
 	}
 
 	return NewToken(TOKEN_NAME, name)
 }
 
-func (t *Tokenizer) readNumber() *Token {
-	text := t.content
-	start := t.current
+func (l *Lexer) readNumber() *Token {
+	text := l.content
+	start := l.current
 
-	for t.current < len(*text) {
-		ch := (*text)[t.current]
+	for l.current < len(*text) {
+		ch := (*text)[l.current]
 		if !isDigit(ch) {
 			break
 		}
-		t.current++
+		l.current++
 	}
-	return NewToken(TOKEN_NUMBER, (*text)[start:t.current])
+	return NewToken(TOKEN_NUMBER, (*text)[start:l.current])
 }
 
-func (t *Tokenizer) SkipWhitespace() {
-	text := t.content
+func (l *Lexer) SkipWhitespace() {
+	text := l.content
 
-	for t.current < len(*text) {
-		ch := (*text)[t.current]
+	for l.current < len(*text) {
+		ch := (*text)[l.current]
 		if !isWhitespace(ch) {
 			break
 		}
 
 		if ch == '\n' {
-			t.line++
-			t.linePos = t.current
+			l.line++
+			l.linePos = l.current + 1
 		}
 
-		t.current++
+		l.current++
 	}
-	t.ch = (*text)[t.current]
+	l.ch = (*text)[l.current]
 }
 
-func (t *Tokenizer) PeekToken(expect TokenKind) bool {
-	start := t.current
-	token := t.Next()
+func (l *Lexer) PeekToken(expect TokenKind) bool {
+	start := l.current
+	token := l.Next()
 	if token.Kind != expect {
-		t.current = start
+		l.current = start
 		return false
 	}
 	return true
 }
 
-func (t *Tokenizer) peekChar(expect byte) bool {
-	if t.current >= len(*t.content) {
+func (l *Lexer) peekChar(expect byte) bool {
+	if l.current >= len(*l.content) {
 		return false
 	}
-	ch := (*t.content)[t.current]
+	ch := (*l.content)[l.current]
 	if ch != expect {
 		return false
 	}
-	t.current++
+	l.current++
 	return true
 }
 
