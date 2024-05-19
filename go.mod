@@ -1,3 +1,3 @@
-module github.com/Kori-Sama/compiler-go
+module github.com/Kori-Sama/kori-compiler
 
 go 1.21.6

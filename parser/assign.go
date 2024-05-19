@@ -1,19 +1,21 @@
 package parser
 
 import (
-	"github.com/Kori-Sama/compiler-go/cerr"
-	"github.com/Kori-Sama/compiler-go/lexer"
+	"github.com/Kori-Sama/kori-compiler/cerr"
+	"github.com/Kori-Sama/kori-compiler/lexer"
 )
 
 type AssignExpr struct {
+	BaseExpr
 	VarName string `json:"var_name"`
 	Expr    Expr   `json:"expr"`
 }
 
 func NewAssignExpr(varName string, expr Expr) *AssignExpr {
 	return &AssignExpr{
-		VarName: varName,
-		Expr:    expr,
+		BaseExpr: BaseExpr{Type: EXPR_ASSIGN},
+		VarName:  varName,
+		Expr:     expr,
 	}
 }
 
@@ -42,29 +44,48 @@ func (p *Parser) parseAssignExpr() (expr Expr) {
 	return NewAssignExpr(varName, expr)
 }
 
-type InitExpr struct {
+type DeclarationExpr struct {
+	BaseExpr
 	VarName string `json:"var_name"`
+	Mutable bool   `json:"mutable"`
+	Kind    string `json:"kind"`
 	Expr    Expr   `json:"expr"`
 }
 
-func NewInitExpr(varName string, expr Expr) *InitExpr {
-	return &InitExpr{
-		VarName: varName,
-		Expr:    expr,
+func NewDeclarationExpr(varName string, mutable bool, expr Expr) *DeclarationExpr {
+	var kind string
+	if mutable {
+		kind = "var"
+	} else {
+		kind = "let"
+	}
+	return &DeclarationExpr{
+		BaseExpr: BaseExpr{Type: EXPR_DECLARATION},
+		VarName:  varName,
+		Mutable:  mutable,
+		Kind:     kind,
+		Expr:     expr,
 	}
 }
 
-func (p *Parser) parseInitExpr() (expr Expr) {
+func (p *Parser) parseDeclarationExpr() (expr Expr) {
 	tok := p.getCurTok()
-	if tok.Kind != lexer.TOKEN_LET {
-		p.Err = cerr.NewParserError("Expected 'let' in initialization", tok.Line, tok.Location)
+
+	mutable := false
+
+	if tok.Kind == lexer.TOKEN_LET {
+
+	} else if tok.Kind == lexer.TOKEN_VAR {
+		mutable = true
+	} else {
+		p.Err = cerr.NewParserError("Expected 'let' or 'var' in Declaration", tok.Line, tok.Location)
 		return nil
 	}
 
 	p.nextToken()
 
 	if p.getCurTok().Kind != lexer.TOKEN_NAME {
-		p.Err = cerr.NewParserError("Expected variable name in initialization", tok.Line, tok.Location)
+		p.Err = cerr.NewParserError("Expected variable name in Declaration", tok.Line, tok.Location)
 		return nil
 	}
 
@@ -72,7 +93,7 @@ func (p *Parser) parseInitExpr() (expr Expr) {
 	p.nextToken()
 
 	if p.getCurTok().Kind != lexer.TOKEN_ASSIGN {
-		p.Err = cerr.NewParserError("Expected '=' in initialization", tok.Line, tok.Location)
+		p.Err = cerr.NewParserError("Expected '=' in Declaration", tok.Line, tok.Location)
 		return nil
 	}
 
@@ -83,5 +104,5 @@ func (p *Parser) parseInitExpr() (expr Expr) {
 		return nil
 	}
 
-	return NewInitExpr(varName, expr)
+	return NewDeclarationExpr(varName, mutable, expr)
 }

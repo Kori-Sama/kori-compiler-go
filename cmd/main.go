@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 
-	"github.com/Kori-Sama/compiler-go/lexer"
+	"github.com/Kori-Sama/kori-compiler/codegen"
+	"github.com/Kori-Sama/kori-compiler/lexer"
+	"github.com/Kori-Sama/kori-compiler/parser"
 )
 
 const (
-	OUTPUT_SUFFIX = ".out"
+	OUTPUT_SUFFIX = ".js"
 )
 
 func main() {
@@ -29,12 +33,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	output := ""
-	for _, token := range tokens {
-		output += fmt.Sprintf("%v: %s\n", token.Kind, token.Literal)
+	parser := parser.NewParser(tokens)
+	asts := parser.Parse()
+
+	output, err := codegen.GenJsCode(asts)
+
+	if parser.Err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", parser.Err)
+		os.Exit(1)
 	}
 
-	fmt.Print(output)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
+
+	err = os.WriteFile(outputPath, []byte(output), 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %s\n", err)
+		os.Exit(1)
+	}
 }
 
 func read_file(path string) *string {
@@ -94,7 +112,8 @@ func parse_args() (inputPath string, outputPath string) {
 	}
 
 	if outputPath == "" {
-		outputPath = inputPath + OUTPUT_SUFFIX
+		prefix := strings.TrimSuffix(inputPath, filepath.Ext(inputPath))
+		outputPath = prefix + OUTPUT_SUFFIX
 	}
 
 	return inputPath, outputPath

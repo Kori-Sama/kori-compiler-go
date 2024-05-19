@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"github.com/Kori-Sama/compiler-go/cerr"
+	"github.com/Kori-Sama/kori-compiler/cerr"
 )
 
 var validTokens = map[string](struct {

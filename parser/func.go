@@ -1,24 +1,35 @@
 package parser
 
 import (
-	"github.com/Kori-Sama/compiler-go/cerr"
-	"github.com/Kori-Sama/compiler-go/lexer"
+	"github.com/Kori-Sama/kori-compiler/cerr"
+	"github.com/Kori-Sama/kori-compiler/lexer"
 )
 
 type PrototypeAST struct {
+	Type string   `json:"type"`
 	Name string   `json:"name"`
 	Args []string `json:"args"`
 }
 
 type FunctionAST struct {
+	Type  string        `json:"type"`
 	Proto *PrototypeAST `json:"proto"`
 	Body  Expr          `json:"body"`
 }
 
 func NewPrototypeAST(name string, args []string) *PrototypeAST {
 	return &PrototypeAST{
+		Type: "Prototype",
 		Name: name,
 		Args: args,
+	}
+}
+
+func NewFunctionAST(proto *PrototypeAST, body Expr) *FunctionAST {
+	return &FunctionAST{
+		Type:  "Function",
+		Proto: proto,
+		Body:  body,
 	}
 }
 
@@ -63,13 +74,6 @@ func (p *Parser) parsePrototype() *PrototypeAST {
 	p.nextToken()
 
 	return NewPrototypeAST(name, args)
-}
-
-func NewFunctionAST(proto *PrototypeAST, body Expr) *FunctionAST {
-	return &FunctionAST{
-		Proto: proto,
-		Body:  body,
-	}
 }
 
 func (p *Parser) parseFunction() *FunctionAST {

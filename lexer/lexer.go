@@ -1,6 +1,6 @@
 package lexer
 
-import "github.com/Kori-Sama/compiler-go/cerr"
+import "github.com/Kori-Sama/kori-compiler/cerr"
 
 type Lexer struct {
 	Err     *cerr.LexerError

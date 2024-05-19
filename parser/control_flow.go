@@ -1,11 +1,12 @@
 package parser
 
 import (
-	"github.com/Kori-Sama/compiler-go/cerr"
-	"github.com/Kori-Sama/compiler-go/lexer"
+	"github.com/Kori-Sama/kori-compiler/cerr"
+	"github.com/Kori-Sama/kori-compiler/lexer"
 )
 
 type IfExpr struct {
+	BaseExpr
 	Cond Expr `json:"cond"`
 	Then Expr `json:"then"`
 	Else Expr `json:"else"`
@@ -13,9 +14,10 @@ type IfExpr struct {
 
 func NewIfExpr(cond, then, else_ Expr) *IfExpr {
 	return &IfExpr{
-		Cond: cond,
-		Then: then,
-		Else: else_,
+		BaseExpr: BaseExpr{Type: EXPR_IF},
+		Cond:     cond,
+		Then:     then,
+		Else:     else_,
 	}
 }
 
@@ -28,20 +30,19 @@ func (p *Parser) parseIfExpr() (expr Expr) {
 
 	then := p.parseBraceExpr()
 
-	if p.getCurTok().Kind != lexer.TOKEN_ELSE {
-		return nil
+	var else_ Expr
+	if p.getCurTok().Kind == lexer.TOKEN_ELSE {
+
+		p.nextToken()
+		else_ = p.parseBraceExpr()
 	}
-
-	p.nextToken()
-
-	else_ := p.parseBraceExpr()
-
 	expr = NewIfExpr(cond, then, else_)
 
 	return expr
 }
 
 type ForExpr struct {
+	BaseExpr
 	VarName string `json:"var_name"`
 	Start   Expr   `json:"start"`
 	End     Expr   `json:"end"`
@@ -51,11 +52,12 @@ type ForExpr struct {
 
 func NewForExpr(varName string, start, end, step, body Expr) *ForExpr {
 	return &ForExpr{
-		VarName: varName,
-		Start:   start,
-		End:     end,
-		Step:    step,
-		Body:    body,
+		BaseExpr: BaseExpr{Type: EXPR_FOR},
+		VarName:  varName,
+		Start:    start,
+		End:      end,
+		Step:     step,
+		Body:     body,
 	}
 }
 
@@ -117,6 +119,28 @@ func (p *Parser) parseForExpr() (expr Expr) {
 	body := p.parseBraceExpr()
 
 	expr = NewForExpr(varName, start, cond, step, body)
+
+	return expr
+}
+
+type ReturnExpr struct {
+	BaseExpr
+	Value Expr `json:"value"`
+}
+
+func NewReturnExpr(value Expr) *ReturnExpr {
+	return &ReturnExpr{
+		BaseExpr: BaseExpr{Type: EXPR_RETURN},
+		Value:    value,
+	}
+}
+
+func (p *Parser) parseReturnExpr() (expr Expr) {
+	p.nextToken()
+
+	value := p.parseExpr()
+
+	expr = NewReturnExpr(value)
 
 	return expr
 }

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Kori-Sama/compiler-go/lexer"
+	"github.com/Kori-Sama/kori-compiler/lexer"
 )
 
-var code = "for let i = 1; i < 2; i = i + 1 {1}; \n if i < 2 {2} else {3}"
+var code = "func foo() { if 1 { return print(1); } return foo(); }"
 
 func TestParser(t *testing.T) {
 	lexer := lexer.NewLexer(&code)
