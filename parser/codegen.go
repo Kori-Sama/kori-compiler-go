@@ -47,7 +47,7 @@ func (n *IfExpr) Codegen() string {
 }
 
 func (n *ForExpr) Codegen() string {
-	return fmt.Sprintf("for (let %s = %s; %s < %s; %s = %s + %s) { %s }", n.VarName, n.Start.Codegen(), n.VarName, n.End.Codegen(), n.VarName, n.VarName, n.Step.Codegen(), n.Body.Codegen())
+	return fmt.Sprintf("for (let %s = %s; %s ; %s) { %s }", n.VarName, n.Start.Codegen(), n.End.Codegen(), n.Step.Codegen(), n.Body.Codegen())
 }
 
 func (n *AssignExpr) Codegen() string {

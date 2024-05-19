@@ -1,0 +1,16 @@
+func main() {
+    let ans = fact(5);
+    print(ans);
+
+    for let i = 0; i < 10; i = i+1; {
+        print(i);
+    }
+}
+
+func fact(num) {
+    if num < 1 {
+        return 1;
+    }
+
+    return fact(num-1) * num;
+}

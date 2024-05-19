@@ -3,12 +3,16 @@
 ### Example
 ```
 func main() {
-    let sum = add(1, 2);
-    print(sum);
+    let ans = fact(5);
+    print(ans);
 }
 
-func add(a, b) {
-    return a + b;
+func fact(num) {
+    if num < 1 {
+        return 1;
+    }
+
+    return fact(num-1) * num;
 }
 ```
 
