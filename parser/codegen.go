@@ -32,7 +32,7 @@ func (n *CallExpr) Codegen() string {
 		args += arg.Codegen()
 	}
 
-	if n.Callee == "print" {
+	if n.Callee == "println" {
 		return fmt.Sprintf("console.log(%s)", args)
 	}
 

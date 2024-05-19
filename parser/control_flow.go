@@ -66,8 +66,8 @@ func NewForExpr(varName string, start, end, step, body Expr) *ForExpr {
 func (p *Parser) parseForExpr() (expr Expr) {
 	p.nextToken()
 
-	if p.getCurTok().Kind != lexer.TOKEN_LET {
-		p.Err = cerr.NewParserError("Expected 'let' in for loop", p.getCurTok().Line, p.getCurTok().Location)
+	if p.getCurTok().Kind != lexer.TOKEN_VAR {
+		p.Err = cerr.NewParserError("Expected 'var' in for loop", p.getCurTok().Line, p.getCurTok().Location)
 		return nil
 	}
 
