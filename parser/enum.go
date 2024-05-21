@@ -18,6 +18,7 @@ const (
 	EXPR_ASSIGN      ExprType = "Assign"
 	EXPR_RETURN      ExprType = "Return"
 	EXPR_BRACE       ExprType = "Brace"
+	EXPR_LAMBDA      ExprType = "Lambda"
 )
 
 type OpKind string

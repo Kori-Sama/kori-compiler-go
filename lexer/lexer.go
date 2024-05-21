@@ -197,11 +197,12 @@ func (l *Lexer) readNumber() *Token {
 
 	for l.current < len(*text) {
 		ch := (*text)[l.current]
-		if !isDigit(ch) {
+		if !isDigit(ch) && ch != '.' {
 			break
 		}
 		l.current++
 	}
+
 	return NewToken(TOKEN_NUMBER, (*text)[start:l.current])
 }
 
@@ -221,6 +222,7 @@ func (l *Lexer) SkipWhitespace() {
 
 		l.current++
 	}
+
 	l.ch = (*text)[l.current]
 }
 

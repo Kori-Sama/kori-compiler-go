@@ -11,6 +11,10 @@ type ICodegen interface {
 }
 
 func (n *NumberExpr) Codegen() string {
+	if n.Val == float64(int(n.Val)) {
+		return fmt.Sprintf("%d", int(n.Val))
+	}
+
 	return fmt.Sprintf("%f", n.Val)
 }
 
@@ -36,7 +40,11 @@ func (n *ArrayExpr) Codegen() string {
 		if i > 0 {
 			values += ", "
 		}
-		values += value.Codegen()
+		if value == nil {
+			values += "null"
+		} else {
+			values += value.Codegen()
+		}
 	}
 	return fmt.Sprintf("[%s]", values)
 }
@@ -72,7 +80,18 @@ func (n *IfExpr) Codegen() string {
 }
 
 func (n *ForExpr) Codegen() string {
-	return fmt.Sprintf("for (let %s = %s; %s ; %s) { %s }", n.VarName, n.Start.Codegen(), n.End.Codegen(), n.Step.Codegen(), n.Body.Codegen())
+	cond := ";;"
+	body := ""
+	if n.VarName == "" && n.Start == nil && n.End == nil && n.Step == nil && n.Body != nil {
+		body = n.Body.Codegen()
+	}
+
+	if n.VarName != "" && n.Start != nil && n.End != nil && n.Step != nil && n.Body != nil {
+		cond = fmt.Sprintf("let %s = %s; %s ; %s", n.VarName, n.Start.Codegen(), n.End.Codegen(), n.Step.Codegen())
+		body = n.Body.Codegen()
+	}
+
+	return fmt.Sprintf("for (%s) { %s }", cond, body)
 }
 
 func (n *AssignExpr) Codegen() string {
@@ -100,7 +119,19 @@ func (n *ReturnExpr) Codegen() string {
 }
 
 func (n *FunctionAST) Codegen() string {
+	if n.Body == nil {
+		return fmt.Sprintf("%s { }", n.Proto.Codegen())
+	}
+
 	return fmt.Sprintf("%s { %s }", n.Proto.Codegen(), n.Body.Codegen())
+}
+
+func (n *LambdaExpr) Codegen() string {
+	if n.Body == nil {
+		return fmt.Sprintf("%s => { }", n.Proto.Codegen())
+	}
+
+	return fmt.Sprintf("%s => { %s }", n.Proto.Codegen(), n.Body.Codegen())
 }
 
 func (n *PrototypeAST) Codegen() string {
@@ -111,6 +142,10 @@ func (n *PrototypeAST) Codegen() string {
 			args += ", "
 		}
 		args += arg
+	}
+
+	if n.Name == "" {
+		return fmt.Sprintf("(%s)", args)
 	}
 
 	return fmt.Sprintf("function %s(%s)", n.Name, args)

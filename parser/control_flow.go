@@ -66,6 +66,12 @@ func NewForExpr(varName string, start, end, step, body Expr) *ForExpr {
 func (p *Parser) parseForExpr() (expr Expr) {
 	p.nextToken()
 
+	if p.getCurTok().Kind == lexer.TOKEN_LBRACE {
+		body := p.parseBraceExpr()
+		expr = NewForExpr("", nil, nil, nil, body)
+		return expr
+	}
+
 	if p.getCurTok().Kind != lexer.TOKEN_VAR {
 		p.Err = cerr.NewParserError("Expected 'var' in for loop", p.getCurTok().Line, p.getCurTok().Location)
 		return nil

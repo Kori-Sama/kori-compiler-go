@@ -40,6 +40,8 @@ func (p *Parser) parsePrimary() Expr {
 		return p.parseForExpr()
 	case lexer.TOKEN_LET, lexer.TOKEN_VAR:
 		return p.parseDeclarationExpr()
+	case lexer.TOKEN_FUNC:
+		return p.parseLambdaExpr()
 	case lexer.TOKEN_RETURN:
 		return p.parseReturnExpr()
 	case lexer.TOKEN_SEMI:

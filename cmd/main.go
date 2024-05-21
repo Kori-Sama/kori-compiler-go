@@ -48,6 +48,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	output = squish(output)
+
 	err = os.WriteFile(outputPath, []byte(output), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %s\n", err)
@@ -76,7 +78,7 @@ func read_file(path string) *string {
 		os.Exit(1)
 	}
 
-	str := string(data)
+	str := strings.TrimSpace(string(data))
 	return &str
 }
 
@@ -124,4 +126,8 @@ func usage(w io.Writer, program string) {
 	fmt.Fprintf(w, "Options:\n")
 	fmt.Fprintf(w, "    -o <output>     Provide output path\n")
 	fmt.Fprintf(w, "    -h              Show this help message\n")
+}
+
+func squish(s string) string {
+	return strings.Join(strings.Fields(s), " ")
 }

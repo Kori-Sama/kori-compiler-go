@@ -137,6 +137,16 @@ var validTokens = map[string](struct {
 			{TOKEN_SEMI, ";", 0, 25},
 		},
 	},
+	"Infinite_For_Loop": {
+		`for { 1; }`,
+		[]Token{
+			{TOKEN_FOR, "for", 0, 0},
+			{TOKEN_LBRACE, "{", 0, 4},
+			{TOKEN_NUMBER, "1", 0, 6},
+			{TOKEN_SEMI, ";", 0, 7},
+			{TOKEN_RBRACE, "}", 0, 9},
+		},
+	},
 }
 
 func TestNextToken(t *testing.T) {

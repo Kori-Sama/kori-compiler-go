@@ -17,6 +17,12 @@ type FunctionAST struct {
 	Body  Expr          `json:"body"`
 }
 
+type LambdaExpr struct {
+	BaseExpr
+	Proto *PrototypeAST `json:"proto"`
+	Body  Expr          `json:"body"`
+}
+
 func NewPrototypeAST(name string, args []string) *PrototypeAST {
 	return &PrototypeAST{
 		Type: "Prototype",
@@ -33,15 +39,34 @@ func NewFunctionAST(proto *PrototypeAST, body Expr) *FunctionAST {
 	}
 }
 
-func (p *Parser) parsePrototype() *PrototypeAST {
-	tok := p.getCurTok()
-	if tok.Kind != lexer.TOKEN_NAME {
-		p.Err = cerr.NewParserError("Expected function name in prototype", tok.Line, tok.Location)
+func NewLambdaExpr(proto *PrototypeAST, body Expr) *LambdaExpr {
+	return &LambdaExpr{
+		BaseExpr: BaseExpr{Type: EXPR_LAMBDA},
+		Proto:    proto,
+		Body:     body,
+	}
+}
+
+func (p *Parser) parseLambdaExpr() Expr {
+	p.nextToken()
+
+	proto := p.parsePrototype()
+	if proto == nil {
 		return nil
 	}
 
-	name := tok.Literal
-	p.nextToken()
+	body := p.parseBraceExpr()
+
+	return NewLambdaExpr(proto, body)
+}
+
+func (p *Parser) parsePrototype() *PrototypeAST {
+	tok := p.getCurTok()
+	name := ""
+	if tok.Kind == lexer.TOKEN_NAME {
+		name = tok.Literal
+		p.nextToken()
+	}
 
 	if p.getCurTok().Kind != lexer.TOKEN_LPAREN {
 		p.Err = cerr.NewParserError("Expected '(' in prototype", tok.Line, tok.Location)
