@@ -23,6 +23,11 @@ type NumberExpr struct {
 	Val float64 `json:"val"`
 }
 
+type StringExpr struct {
+	BaseExpr
+	Val string `json:"val"`
+}
+
 type VariableExpr struct {
 	BaseExpr
 	Name string `json:"name"`
@@ -49,6 +54,13 @@ type CallExpr struct {
 func NewNumberExpr(val float64) *NumberExpr {
 	return &NumberExpr{
 		BaseExpr: BaseExpr{Type: EXPR_NUMBER},
+		Val:      val,
+	}
+}
+
+func NewStringExpr(val string) *StringExpr {
+	return &StringExpr{
+		BaseExpr: BaseExpr{Type: EXPR_STRING},
 		Val:      val,
 	}
 }

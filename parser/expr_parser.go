@@ -22,6 +22,8 @@ func (p *Parser) parsePrimary() Expr {
 	switch tok.Kind {
 	case lexer.TOKEN_NUMBER:
 		return p.parseNumberExpr()
+	case lexer.TOKEN_STRING:
+		return p.parseStringExpr()
 	case lexer.TOKEN_LPAREN:
 		return p.parseParenExpr()
 	case lexer.TOKEN_NAME:
@@ -138,6 +140,20 @@ func (p *Parser) parseNumberExpr() (expr Expr) {
 		return nil
 	}
 	expr = NewNumberExpr(val)
+
+	p.nextToken()
+
+	return expr
+}
+
+func (p *Parser) parseStringExpr() (expr Expr) {
+	tok := p.getCurTok()
+	if tok.Kind != lexer.TOKEN_STRING {
+		p.Err = cerr.NewParserError("Expected string", tok.Line, tok.Location)
+		return nil
+	}
+
+	expr = NewStringExpr(tok.Literal)
 
 	p.nextToken()
 

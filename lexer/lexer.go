@@ -57,6 +57,8 @@ func (l *Lexer) Next() *Token {
 		token = l.readName()
 	} else if isDigit(l.ch) {
 		token = l.readNumber()
+	} else if l.ch == '"' {
+		token = l.readString()
 	} else {
 		token = l.readSymbol()
 		if token.Kind == TOKEN_ILLEGAL {
@@ -149,6 +151,23 @@ func (l *Lexer) readKeyword(name string) *Token {
 	default:
 		return nil
 	}
+}
+
+func (l *Lexer) readString() *Token {
+	text := l.content
+	l.current++
+	start := l.current
+	for {
+		if l.current >= len(*text) {
+			return NewToken(TOKEN_ILLEGAL, "EOF")
+		}
+		if (*text)[l.current] == '"' {
+			break
+		}
+		l.current++
+	}
+	l.current++
+	return NewToken(TOKEN_STRING, (*text)[start:l.current-1])
 }
 
 func (l *Lexer) readName() *Token {

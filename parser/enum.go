@@ -6,6 +6,7 @@ type ExprType string
 
 const (
 	EXPR_NUMBER      ExprType = "Number"
+	EXPR_STRING      ExprType = "String"
 	EXPR_VARIABLE    ExprType = "Variable"
 	EXPR_BINARY      ExprType = "Binary"
 	EXPR_CALL        ExprType = "Call"

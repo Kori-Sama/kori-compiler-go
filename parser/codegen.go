@@ -12,6 +12,10 @@ func (n *NumberExpr) Codegen() string {
 	return fmt.Sprintf("%f", n.Val)
 }
 
+func (n *StringExpr) Codegen() string {
+	return fmt.Sprintf(`"%s"`, n.Val)
+}
+
 func (n *VariableExpr) Codegen() string {
 	return n.Name
 }

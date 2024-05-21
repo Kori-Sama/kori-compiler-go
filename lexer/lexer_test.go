@@ -127,6 +127,16 @@ var validTokens = map[string](struct {
 			{TOKEN_LBRACE, "{", 0, 16},
 			{TOKEN_RBRACE, "}", 0, 17}},
 	},
+	"String": {
+		`let str = "Hello, World!";`,
+		[]Token{
+			{TOKEN_LET, "let", 0, 0},
+			{TOKEN_NAME, "str", 0, 4},
+			{TOKEN_ASSIGN, "=", 0, 8},
+			{TOKEN_STRING, "Hello, World!", 0, 10},
+			{TOKEN_SEMI, ";", 0, 25},
+		},
+	},
 }
 
 func TestNextToken(t *testing.T) {
