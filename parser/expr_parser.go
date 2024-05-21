@@ -22,8 +22,12 @@ func (p *Parser) parsePrimary() Expr {
 	switch tok.Kind {
 	case lexer.TOKEN_NUMBER:
 		return p.parseNumberExpr()
+	case lexer.TOKEN_TRUE, lexer.TOKEN_FALSE:
+		return p.parseBooleanExpr()
 	case lexer.TOKEN_STRING:
 		return p.parseStringExpr()
+	case lexer.TOKEN_LBRACKET:
+		return p.parseArrayExpr()
 	case lexer.TOKEN_LPAREN:
 		return p.parseParenExpr()
 	case lexer.TOKEN_NAME:
@@ -146,6 +150,21 @@ func (p *Parser) parseNumberExpr() (expr Expr) {
 	return expr
 }
 
+func (p *Parser) parseBooleanExpr() (expr Expr) {
+	tok := p.getCurTok()
+	if tok.Kind != lexer.TOKEN_TRUE && tok.Kind != lexer.TOKEN_FALSE {
+		p.Err = cerr.NewParserError("Expected boolean", tok.Line, tok.Location)
+		return nil
+	}
+
+	val := tok.Kind == lexer.TOKEN_TRUE
+	expr = NewBooleanExpr(val)
+
+	p.nextToken()
+
+	return expr
+}
+
 func (p *Parser) parseStringExpr() (expr Expr) {
 	tok := p.getCurTok()
 	if tok.Kind != lexer.TOKEN_STRING {
@@ -158,6 +177,43 @@ func (p *Parser) parseStringExpr() (expr Expr) {
 	p.nextToken()
 
 	return expr
+}
+
+func (p *Parser) parseArrayExpr() (expr Expr) {
+	p.nextToken()
+
+	if p.getCurTok().Kind == lexer.TOKEN_RBRACKET {
+		p.nextToken()
+		return nil
+	}
+
+	var values []Expr
+	for {
+		if p.getCurTok().Kind == lexer.TOKEN_RBRACKET {
+			break
+		}
+
+		value := p.parseExpr()
+		if value == nil {
+			return nil
+		}
+
+		values = append(values, value)
+
+		if p.getCurTok().Kind == lexer.TOKEN_RBRACKET {
+			break
+		}
+
+		if p.getCurTok().Kind != lexer.TOKEN_COMMA {
+			p.Err = cerr.NewParserError("Expected ',' or ']' in array", p.getCurTok().Line, p.getCurTok().Location)
+			return nil
+		}
+
+		p.nextToken()
+	}
+
+	p.nextToken()
+	return NewArrayExpr(values)
 }
 
 func (p *Parser) parseParenExpr() (expr Expr) {

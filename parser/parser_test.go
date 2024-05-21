@@ -7,7 +7,7 @@ import (
 	"github.com/Kori-Sama/kori-compiler/lexer"
 )
 
-var code = "func foo() { let str = \"123\"; }"
+var code = "func foo() { let arr = true; }"
 
 func TestParser(t *testing.T) {
 	lexer := lexer.NewLexer(&code)

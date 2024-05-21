@@ -1,6 +1,8 @@
 package parser
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // target: javascript
 
@@ -12,12 +14,31 @@ func (n *NumberExpr) Codegen() string {
 	return fmt.Sprintf("%f", n.Val)
 }
 
+func (n *BooleanExpr) Codegen() string {
+	if n.Val {
+		return "true"
+	} else {
+		return "false"
+	}
+}
+
 func (n *StringExpr) Codegen() string {
 	return fmt.Sprintf(`"%s"`, n.Val)
 }
 
 func (n *VariableExpr) Codegen() string {
 	return n.Name
+}
+
+func (n *ArrayExpr) Codegen() string {
+	values := ""
+	for i, value := range n.Values {
+		if i > 0 {
+			values += ", "
+		}
+		values += value.Codegen()
+	}
+	return fmt.Sprintf("[%s]", values)
 }
 
 func (n *BinaryExpr) Codegen() string {

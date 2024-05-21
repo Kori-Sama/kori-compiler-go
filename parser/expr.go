@@ -23,6 +23,11 @@ type NumberExpr struct {
 	Val float64 `json:"val"`
 }
 
+type BooleanExpr struct {
+	BaseExpr
+	Val bool `json:"val"`
+}
+
 type StringExpr struct {
 	BaseExpr
 	Val string `json:"val"`
@@ -31,6 +36,11 @@ type StringExpr struct {
 type VariableExpr struct {
 	BaseExpr
 	Name string `json:"name"`
+}
+
+type ArrayExpr struct {
+	BaseExpr
+	Values []Expr `json:"values"`
 }
 
 type BinaryExpr struct {
@@ -58,6 +68,13 @@ func NewNumberExpr(val float64) *NumberExpr {
 	}
 }
 
+func NewBooleanExpr(val bool) *BooleanExpr {
+	return &BooleanExpr{
+		BaseExpr: BaseExpr{Type: EXPR_BOOLEAN},
+		Val:      val,
+	}
+}
+
 func NewStringExpr(val string) *StringExpr {
 	return &StringExpr{
 		BaseExpr: BaseExpr{Type: EXPR_STRING},
@@ -69,6 +86,13 @@ func NewVariableExpr(name string) *VariableExpr {
 	return &VariableExpr{
 		BaseExpr: BaseExpr{Type: EXPR_VARIABLE},
 		Name:     name,
+	}
+}
+
+func NewArrayExpr(values []Expr) *ArrayExpr {
+	return &ArrayExpr{
+		BaseExpr: BaseExpr{Type: EXPR_ARRAY},
+		Values:   values,
 	}
 }
 
