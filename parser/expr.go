@@ -50,6 +50,12 @@ type BinaryExpr struct {
 	RHS Expr   `json:"rhs"`
 }
 
+type UnaryExpr struct {
+	BaseExpr
+	Op  OpKind `json:"op"`
+	RHS Expr   `json:"rhs"`
+}
+
 type BraceExpr struct {
 	BaseExpr
 	Exprs []Expr `json:"exprs"`
@@ -101,6 +107,14 @@ func NewBinaryExpr(op OpKind, lhs, rhs Expr) *BinaryExpr {
 		BaseExpr: BaseExpr{Type: EXPR_BINARY},
 		Op:       op,
 		LHS:      lhs,
+		RHS:      rhs,
+	}
+}
+
+func NewUnaryExpr(op OpKind, rhs Expr) *UnaryExpr {
+	return &UnaryExpr{
+		BaseExpr: BaseExpr{Type: EXPR_UNARY},
+		Op:       op,
 		RHS:      rhs,
 	}
 }

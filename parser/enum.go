@@ -11,6 +11,7 @@ const (
 	EXPR_VARIABLE    ExprType = "Variable"
 	EXPR_ARRAY       ExprType = "Array"
 	EXPR_BINARY      ExprType = "Binary"
+	EXPR_UNARY       ExprType = "Unary"
 	EXPR_CALL        ExprType = "Call"
 	EXPR_IF          ExprType = "If"
 	EXPR_FOR         ExprType = "For"

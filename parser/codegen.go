@@ -57,6 +57,10 @@ func (n *BinaryExpr) Codegen() string {
 	return fmt.Sprintf("(%s %s %s)", n.LHS.Codegen(), n.Op, n.RHS.Codegen())
 }
 
+func (n *UnaryExpr) Codegen() string {
+	return fmt.Sprintf("(%s %s)", n.Op, n.RHS.Codegen())
+}
+
 func (n *CallExpr) Codegen() string {
 	args := ""
 	for i, arg := range n.Args {

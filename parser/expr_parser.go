@@ -44,8 +44,8 @@ func (p *Parser) parsePrimary() Expr {
 		return p.parseLambdaExpr()
 	case lexer.TOKEN_RETURN:
 		return p.parseReturnExpr()
-	// case lexer.TOKEN_BANG:
-	// 	return p.parseUnaryExpr()
+	case lexer.TOKEN_BANG:
+		return p.parseUnaryExpr()
 	case lexer.TOKEN_SEMI:
 		return nil
 	case lexer.TOKEN_EOF:
@@ -98,6 +98,22 @@ func (p *Parser) parseBinOpRHS(exprPrec int, lhs Expr) Expr {
 			p.nextToken()
 		}
 	}
+}
+
+func (p *Parser) parseUnaryExpr() Expr {
+	var op OpKind
+	if p.getCurTok().Kind == lexer.TOKEN_BANG {
+		op = OP_NOT
+	}
+
+	p.nextToken()
+
+	expr := p.parsePrimary()
+	if expr == nil {
+		return nil
+	}
+
+	return NewUnaryExpr(op, expr)
 }
 
 func (p *Parser) parseBraceExpr() Expr {
