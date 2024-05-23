@@ -50,15 +50,15 @@ func (n *ArrayExpr) Codegen() string {
 }
 
 func (n *BinaryExpr) Codegen() string {
-	if n.Op == OP_INDEX {
-		return fmt.Sprintf("%s[%s]", n.LHS.Codegen(), n.RHS.Codegen())
-	}
-
 	return fmt.Sprintf("(%s %s %s)", n.LHS.Codegen(), n.Op, n.RHS.Codegen())
 }
 
 func (n *UnaryExpr) Codegen() string {
 	return fmt.Sprintf("(%s %s)", n.Op, n.RHS.Codegen())
+}
+
+func (n *IndexAssignExpr) Codegen() string {
+	return fmt.Sprintf("%s[%s] = %s", n.Array, n.Index.Codegen(), n.Expr.Codegen())
 }
 
 func (n *CallExpr) Codegen() string {
@@ -77,7 +77,15 @@ func (n *CallExpr) Codegen() string {
 		return fmt.Sprintf("console.log(%s)", args)
 	}
 
+	if n.Callee == "len" {
+		return fmt.Sprintf("%s.length", args)
+	}
+
 	return fmt.Sprintf("%s(%s)", n.Callee, args)
+}
+
+func (n *IndexExpr) Codegen() string {
+	return fmt.Sprintf("%s[%s]", n.Array, n.Index.Codegen())
 }
 
 func (n *IfExpr) Codegen() string {

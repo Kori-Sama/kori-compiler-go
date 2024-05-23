@@ -11,10 +11,26 @@ type AssignExpr struct {
 	Expr    Expr   `json:"expr"`
 }
 
+type IndexAssignExpr struct {
+	BaseExpr
+	Array string `json:"var_name"`
+	Index Expr   `json:"index"`
+	Expr  Expr   `json:"expr"`
+}
+
 func NewAssignExpr(varName string, expr Expr) *AssignExpr {
 	return &AssignExpr{
 		BaseExpr: BaseExpr{Type: EXPR_ASSIGN},
 		VarName:  varName,
+		Expr:     expr,
+	}
+}
+
+func NewIndexAssignExpr(array string, index, expr Expr) *IndexAssignExpr {
+	return &IndexAssignExpr{
+		BaseExpr: BaseExpr{Type: EXPR_INDEX_ASSIGN},
+		Array:    array,
+		Index:    index,
 		Expr:     expr,
 	}
 }

@@ -7,8 +7,16 @@ import (
 	"github.com/Kori-Sama/kori-compiler/lexer"
 )
 
-var code = `func main() {
-	let a = true && false;
+var code = `func sort(arr, len) {
+  for var i = 0; i < len; i +=1; {
+      for var j = i + 1; j < len; j +=1; {
+          if arr[i] > arr[j] {
+              let tmp = arr[i];
+              arr[i] = arr[j];
+              arr[j] = tmp;
+          }
+      }
+    }
 }`
 
 func TestParser(t *testing.T) {

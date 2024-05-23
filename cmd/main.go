@@ -19,8 +19,8 @@ const (
 func main() {
 	inputPath, outputPath := parse_args()
 
-	fmt.Printf("Input path: %s\n", inputPath)
-	fmt.Printf("Output path: %s\n", outputPath)
+//	fmt.Printf("Input path: %s\n", inputPath)
+//	fmt.Printf("Output path: %s\n", outputPath)
 
 	input := read_file(inputPath)
 

@@ -5,23 +5,24 @@ import "github.com/Kori-Sama/kori-compiler/lexer"
 type ExprType string
 
 const (
-	EXPR_NUMBER      ExprType = "Number"
-	EXPR_BOOLEAN     ExprType = "Boolean"
-	EXPR_STRING      ExprType = "String"
-	EXPR_VARIABLE    ExprType = "Variable"
-	EXPR_ARRAY       ExprType = "Array"
-	EXPR_BINARY      ExprType = "Binary"
-	EXPR_UNARY       ExprType = "Unary"
-	EXPR_CALL        ExprType = "Call"
-	EXPR_IF          ExprType = "If"
-	EXPR_FOR         ExprType = "For"
-	EXPR_FOREACH     ExprType = "Foreach"
-	EXPR_DECLARATION ExprType = "Declaration"
-	EXPR_ASSIGN      ExprType = "Assign"
-	EXPR_RETURN      ExprType = "Return"
-	EXPR_BRACE       ExprType = "Brace"
-	EXPR_LAMBDA      ExprType = "Lambda"
-	EXPR_INDEX       ExprType = "Index"
+	EXPR_NUMBER       ExprType = "Number"
+	EXPR_BOOLEAN      ExprType = "Boolean"
+	EXPR_STRING       ExprType = "String"
+	EXPR_VARIABLE     ExprType = "Variable"
+	EXPR_ARRAY        ExprType = "Array"
+	EXPR_BINARY       ExprType = "Binary"
+	EXPR_UNARY        ExprType = "Unary"
+	EXPR_CALL         ExprType = "Call"
+	EXPR_IF           ExprType = "If"
+	EXPR_FOR          ExprType = "For"
+	EXPR_FOREACH      ExprType = "Foreach"
+	EXPR_DECLARATION  ExprType = "Declaration"
+	EXPR_ASSIGN       ExprType = "Assign"
+	EXPR_RETURN       ExprType = "Return"
+	EXPR_BRACE        ExprType = "Brace"
+	EXPR_LAMBDA       ExprType = "Lambda"
+	EXPR_INDEX        ExprType = "Index"
+	EXPR_INDEX_ASSIGN ExprType = "IndexAssign"
 )
 
 type OpKind string
@@ -36,7 +37,6 @@ const (
 	OP_LESS_EQ     OpKind = "<="
 	OP_GREATER_EQ  OpKind = ">="
 	OP_EQ          OpKind = "=="
-	OP_INDEX       OpKind = "[]"
 	OP_AND         OpKind = "&"
 	OP_OR          OpKind = "|"
 	OP_LOGICAL_AND OpKind = "&&"
@@ -79,8 +79,6 @@ func getBinOpKind(kind lexer.TokenKind) OpKind {
 		return OP_MUL
 	case lexer.TOKEN_SLASH:
 		return OP_DIV
-	case lexer.TOKEN_LBRACKET:
-		return OP_INDEX
 	case lexer.TOKEN_AND:
 		return OP_AND
 	case lexer.TOKEN_OR:

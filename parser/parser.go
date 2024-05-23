@@ -60,7 +60,6 @@ var binOpPrecedence = map[OpKind]int{
 	OP_SUB:        20,
 	OP_MUL:        40,
 	OP_DIV:        40,
-	OP_INDEX:      50,
 }
 
 func (p *Parser) HandleFunction() *FunctionAST {

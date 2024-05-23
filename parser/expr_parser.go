@@ -93,10 +93,6 @@ func (p *Parser) parseBinOpRHS(exprPrec int, lhs Expr) Expr {
 		}
 
 		lhs = NewBinaryExpr(binOp, lhs, rhs)
-
-		if p.getCurTok().Kind == lexer.TOKEN_RBRACKET && binOp == OP_INDEX {
-			p.nextToken()
-		}
 	}
 }
 
@@ -264,6 +260,10 @@ func (p *Parser) parseIdentifierExpr() (expr Expr) {
 		return p.parseAssignExpr()
 	}
 
+	if p.peekExpect(1, lexer.TOKEN_LBRACKET) {
+		return p.parseIndexExpr()
+	}
+
 	if p.peekExpect(1, lexer.TOKEN_PLUS_EQ) ||
 		p.peekExpect(1, lexer.TOKEN_MINUS_EQ) ||
 		p.peekExpect(1, lexer.TOKEN_STAR_EQ) ||
@@ -313,4 +313,42 @@ func (p *Parser) parseIdentifierExpr() (expr Expr) {
 
 	p.nextToken()
 	return NewCallExpr(tok.Literal, args)
+}
+
+func (p *Parser) parseIndexExpr() (expr Expr) {
+	tok := p.getCurTok()
+	if tok.Kind != lexer.TOKEN_NAME {
+		p.Err = cerr.NewParserError("Expected identifier", tok.Line, tok.Location)
+		return nil
+	}
+	p.nextToken()
+
+	if p.getCurTok().Kind != lexer.TOKEN_LBRACKET {
+		p.Err = cerr.NewParserError("Expected '['", tok.Line, tok.Location)
+		return nil
+	}
+	p.nextToken()
+
+	index := p.parseExpr()
+	if index == nil {
+		return nil
+	}
+
+	if p.getCurTok().Kind != lexer.TOKEN_RBRACKET {
+		p.Err = cerr.NewParserError("Expected ']'", tok.Line, tok.Location)
+		return nil
+	}
+	p.nextToken()
+
+	if p.getCurTok().Kind == lexer.TOKEN_ASSIGN {
+		p.nextToken()
+		value := p.parseExpr()
+		if value == nil {
+			return nil
+		}
+
+		return NewIndexAssignExpr(tok.Literal, index, value)
+	}
+
+	return NewIndexExpr(tok.Literal, index)
 }

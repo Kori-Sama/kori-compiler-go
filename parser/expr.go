@@ -67,6 +67,12 @@ type CallExpr struct {
 	Args   []Expr `json:"args"`
 }
 
+type IndexExpr struct {
+	BaseExpr
+	Array string `json:"array"`
+	Index Expr   `json:"index"`
+}
+
 func NewNumberExpr(val float64) *NumberExpr {
 	return &NumberExpr{
 		BaseExpr: BaseExpr{Type: EXPR_NUMBER},
@@ -131,6 +137,14 @@ func NewCallExpr(callee string, args []Expr) *CallExpr {
 		BaseExpr: BaseExpr{Type: EXPR_CALL},
 		Callee:   callee,
 		Args:     args,
+	}
+}
+
+func NewIndexExpr(array string, index Expr) *IndexExpr {
+	return &IndexExpr{
+		BaseExpr: BaseExpr{Type: EXPR_INDEX},
+		Array:    array,
+		Index:    index,
 	}
 }
 
