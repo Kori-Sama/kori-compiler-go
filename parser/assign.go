@@ -44,6 +44,41 @@ func (p *Parser) parseAssignExpr() (expr Expr) {
 	return NewAssignExpr(varName, expr)
 }
 
+func (p *Parser) parseAssignOpExpr() (expr Expr) {
+	tok := p.getCurTok()
+	if tok.Kind != lexer.TOKEN_NAME {
+		p.Err = cerr.NewParserError("Expected variable name in assignment", tok.Line, tok.Location)
+		return nil
+	}
+
+	varName := tok.Literal
+	p.nextToken()
+
+	var op OpKind
+	switch p.getCurTok().Kind {
+	case lexer.TOKEN_PLUS_EQ:
+		op = OP_ADD
+	case lexer.TOKEN_MINUS_EQ:
+		op = OP_SUB
+	case lexer.TOKEN_STAR_EQ:
+		op = OP_MUL
+	case lexer.TOKEN_SLASH_EQ:
+		op = OP_DIV
+	default:
+		p.Err = cerr.NewParserError("Expected '+=' or '-=' or '*=' or '/=' in assignment", tok.Line, tok.Location)
+		return nil
+	}
+
+	p.nextToken()
+
+	expr = p.parseExpr()
+	if expr == nil {
+		return nil
+	}
+
+	return NewAssignExpr(varName, NewBinaryExpr(op, NewVariableExpr(varName), expr))
+}
+
 type DeclarationExpr struct {
 	BaseExpr
 	VarName string `json:"var_name"`

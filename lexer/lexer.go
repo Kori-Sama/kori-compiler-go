@@ -113,13 +113,35 @@ func (l *Lexer) readSymbol() *Token {
 	case ',':
 		return NewToken(TOKEN_COMMA, ",")
 	case '+':
+		if l.peekChar('=') {
+			return NewToken(TOKEN_PLUS_EQ, "+=")
+		}
 		return NewToken(TOKEN_PLUS, "+")
 	case '-':
+		if l.peekChar('=') {
+			return NewToken(TOKEN_MINUS_EQ, "-=")
+		}
 		return NewToken(TOKEN_MINUS, "-")
 	case '/':
+		if l.peekChar('=') {
+			return NewToken(TOKEN_SLASH_EQ, "/=")
+		}
 		return NewToken(TOKEN_SLASH, "/")
 	case '*':
+		if l.peekChar('=') {
+			return NewToken(TOKEN_STAR_EQ, "*=")
+		}
 		return NewToken(TOKEN_STAR, "*")
+	case '&':
+		if l.peekChar('&') {
+			return NewToken(TOKEN_LOGICAL_AND, "&&")
+		}
+		return NewToken(TOKEN_AND, "&")
+	case '|':
+		if l.peekChar('|') {
+			return NewToken(TOKEN_LOGICAL_OR, "||")
+		}
+		return NewToken(TOKEN_OR, "|")
 	default:
 		return NewToken(TOKEN_ILLEGAL, string(l.ch))
 	}
@@ -148,6 +170,10 @@ func (l *Lexer) readKeyword(name string) *Token {
 		return NewToken(TOKEN_FALSE, "false")
 	case "for":
 		return NewToken(TOKEN_FOR, "for")
+	case "in":
+		return NewToken(TOKEN_IN, "in")
+	case "struct":
+		return NewToken(TOKEN_STRUCT, "struct")
 	default:
 		return nil
 	}

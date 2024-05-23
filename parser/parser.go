@@ -43,6 +43,13 @@ func (p *Parser) getCurTok() *lexer.Token {
 	return p.tokens[p.curTok]
 }
 
+func (p *Parser) peekExpect(offset int, expect lexer.TokenKind) bool {
+	if p.curTok+offset >= len(p.tokens) {
+		return false
+	}
+	return p.tokens[p.curTok+offset].Kind == expect
+}
+
 var binOpPrecedence = map[OpKind]int{
 	OP_LESS:       10,
 	OP_GREATER:    10,
@@ -53,6 +60,7 @@ var binOpPrecedence = map[OpKind]int{
 	OP_SUB:        20,
 	OP_MUL:        40,
 	OP_DIV:        40,
+	OP_INDEX:      50,
 }
 
 func (p *Parser) HandleFunction() *FunctionAST {

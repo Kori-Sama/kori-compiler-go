@@ -3,7 +3,7 @@
 ### Target code is JavaScript, so it needs node environment to run the compiled code
 
 ### Example
-```go
+```swift
 func main() {
     let ans = fact(5);
     println(ans);
@@ -31,4 +31,4 @@ func fact(num) {
 ### Tips
 
 - The entry of this language is main function
-- Every expression should end with a semicolon
+- Every expression should be end with a semicolon

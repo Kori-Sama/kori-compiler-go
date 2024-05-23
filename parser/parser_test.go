@@ -8,7 +8,7 @@ import (
 )
 
 var code = `func main() {
-	let a = func() {};
+	let a = true && false;
 }`
 
 func TestParser(t *testing.T) {

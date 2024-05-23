@@ -14,31 +14,44 @@ const (
 	EXPR_CALL        ExprType = "Call"
 	EXPR_IF          ExprType = "If"
 	EXPR_FOR         ExprType = "For"
+	EXPR_FOREACH     ExprType = "Foreach"
 	EXPR_DECLARATION ExprType = "Declaration"
 	EXPR_ASSIGN      ExprType = "Assign"
 	EXPR_RETURN      ExprType = "Return"
 	EXPR_BRACE       ExprType = "Brace"
 	EXPR_LAMBDA      ExprType = "Lambda"
+	EXPR_INDEX       ExprType = "Index"
 )
 
 type OpKind string
 
 const (
-	OP_ADD        OpKind = "+"
-	OP_SUB        OpKind = "-"
-	OP_MUL        OpKind = "*"
-	OP_DIV        OpKind = "/"
-	OP_LESS       OpKind = "<"
-	OP_GREATER    OpKind = ">"
-	OP_LESS_EQ    OpKind = "<="
-	OP_GREATER_EQ OpKind = ">="
-	OP_EQ         OpKind = "=="
-	OP_UNKNOWN    OpKind = "UNKNOWN"
+	OP_ADD         OpKind = "+"
+	OP_SUB         OpKind = "-"
+	OP_MUL         OpKind = "*"
+	OP_DIV         OpKind = "/"
+	OP_LESS        OpKind = "<"
+	OP_GREATER     OpKind = ">"
+	OP_LESS_EQ     OpKind = "<="
+	OP_GREATER_EQ  OpKind = ">="
+	OP_EQ          OpKind = "=="
+	OP_INDEX       OpKind = "[]"
+	OP_AND         OpKind = "&"
+	OP_OR          OpKind = "|"
+	OP_LOGICAL_AND OpKind = "&&"
+	OP_LOGICAL_OR  OpKind = "||"
+	OP_NOT         OpKind = "!"
+	OP_UNKNOWN     OpKind = "UNKNOWN"
 )
 
 func isOpKind(tokenKind lexer.TokenKind) bool {
 	switch tokenKind {
-	case lexer.TOKEN_LESS, lexer.TOKEN_GREATER, lexer.TOKEN_LESS_EQ, lexer.TOKEN_GREATER_EQ, lexer.TOKEN_EQ, lexer.TOKEN_PLUS, lexer.TOKEN_MINUS, lexer.TOKEN_STAR, lexer.TOKEN_SLASH:
+	case lexer.TOKEN_LBRACKET,
+		lexer.TOKEN_LESS, lexer.TOKEN_GREATER,
+		lexer.TOKEN_LESS_EQ, lexer.TOKEN_GREATER_EQ,
+		lexer.TOKEN_AND, lexer.TOKEN_OR,
+		lexer.TOKEN_LOGICAL_AND, lexer.TOKEN_LOGICAL_OR,
+		lexer.TOKEN_EQ, lexer.TOKEN_PLUS, lexer.TOKEN_MINUS, lexer.TOKEN_STAR, lexer.TOKEN_SLASH:
 		return true
 	default:
 		return false
@@ -65,6 +78,16 @@ func getBinOpKind(kind lexer.TokenKind) OpKind {
 		return OP_MUL
 	case lexer.TOKEN_SLASH:
 		return OP_DIV
+	case lexer.TOKEN_LBRACKET:
+		return OP_INDEX
+	case lexer.TOKEN_AND:
+		return OP_AND
+	case lexer.TOKEN_OR:
+		return OP_OR
+	case lexer.TOKEN_LOGICAL_AND:
+		return OP_LOGICAL_AND
+	case lexer.TOKEN_LOGICAL_OR:
+		return OP_LOGICAL_OR
 	default:
 		return OP_UNKNOWN
 	}

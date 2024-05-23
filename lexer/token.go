@@ -11,6 +11,10 @@ const (
 	TOKEN_EQ
 	TOKEN_NOT_EQ
 	TOKEN_BANG
+	TOKEN_AND
+	TOKEN_OR
+	TOKEN_LOGICAL_AND
+	TOKEN_LOGICAL_OR
 	TOKEN_LESS
 	TOKEN_GREATER
 	TOKEN_LESS_EQ
@@ -28,6 +32,11 @@ const (
 	TOKEN_MINUS
 	TOKEN_SLASH
 	TOKEN_STAR
+	TOKEN_PLUS_EQ
+	TOKEN_MINUS_EQ
+	TOKEN_SLASH_EQ
+	TOKEN_STAR_EQ
+	TOKEN_STRUCT
 	TOKEN_EOF
 	// Keyword
 	TOKEN_FUNC
@@ -40,6 +49,7 @@ const (
 	TOKEN_TRUE
 	TOKEN_FALSE
 	TOKEN_FOR
+	TOKEN_IN
 )
 
 type Token struct {
@@ -97,6 +107,11 @@ var tokenNamesMap = map[TokenKind]string{
 	TOKEN_MINUS:      "MINUS",
 	TOKEN_SLASH:      "SLASH",
 	TOKEN_STAR:       "STAR",
+	TOKEN_PLUS_EQ:    "PLUS_EQ",
+	TOKEN_MINUS_EQ:   "MINUS_EQ",
+	TOKEN_SLASH_EQ:   "SLASH_EQ",
+	TOKEN_STAR_EQ:    "STAR_EQ",
+	TOKEN_STRUCT:     "STRUCT",
 	TOKEN_EOF:        "EOF",
 	TOKEN_FUNC:       "FUNC",
 	TOKEN_LET:        "LET",
@@ -108,4 +123,5 @@ var tokenNamesMap = map[TokenKind]string{
 	TOKEN_TRUE:       "TRUE",
 	TOKEN_FALSE:      "FALSE",
 	TOKEN_FOR:        "FOR",
+	TOKEN_IN:         "IN",
 }

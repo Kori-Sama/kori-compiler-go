@@ -50,6 +50,10 @@ func (n *ArrayExpr) Codegen() string {
 }
 
 func (n *BinaryExpr) Codegen() string {
+	if n.Op == OP_INDEX {
+		return fmt.Sprintf("%s[%s]", n.LHS.Codegen(), n.RHS.Codegen())
+	}
+
 	return fmt.Sprintf("(%s %s %s)", n.LHS.Codegen(), n.Op, n.RHS.Codegen())
 }
 
@@ -92,6 +96,10 @@ func (n *ForExpr) Codegen() string {
 	}
 
 	return fmt.Sprintf("for (%s) { %s }", cond, body)
+}
+
+func (n *ForeachExpr) Codegen() string {
+	return fmt.Sprintf("for (let %s in %s) { %s }", n.VarName, n.Array.Codegen(), n.Body.Codegen())
 }
 
 func (n *AssignExpr) Codegen() string {

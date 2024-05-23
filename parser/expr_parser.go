@@ -44,6 +44,8 @@ func (p *Parser) parsePrimary() Expr {
 		return p.parseLambdaExpr()
 	case lexer.TOKEN_RETURN:
 		return p.parseReturnExpr()
+	// case lexer.TOKEN_BANG:
+	// 	return p.parseUnaryExpr()
 	case lexer.TOKEN_SEMI:
 		return nil
 	case lexer.TOKEN_EOF:
@@ -91,6 +93,10 @@ func (p *Parser) parseBinOpRHS(exprPrec int, lhs Expr) Expr {
 		}
 
 		lhs = NewBinaryExpr(binOp, lhs, rhs)
+
+		if p.getCurTok().Kind == lexer.TOKEN_RBRACKET && binOp == OP_INDEX {
+			p.nextToken()
+		}
 	}
 }
 
@@ -238,6 +244,17 @@ func (p *Parser) parseParenExpr() (expr Expr) {
 }
 
 func (p *Parser) parseIdentifierExpr() (expr Expr) {
+	if p.peekExpect(1, lexer.TOKEN_ASSIGN) {
+		return p.parseAssignExpr()
+	}
+
+	if p.peekExpect(1, lexer.TOKEN_PLUS_EQ) ||
+		p.peekExpect(1, lexer.TOKEN_MINUS_EQ) ||
+		p.peekExpect(1, lexer.TOKEN_STAR_EQ) ||
+		p.peekExpect(1, lexer.TOKEN_SLASH_EQ) {
+		return p.parseAssignOpExpr()
+	}
+
 	tok := p.getCurTok()
 	if tok.Kind != lexer.TOKEN_NAME {
 		p.Err = cerr.NewParserError("Expected identifier", tok.Line, tok.Location)

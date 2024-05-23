@@ -61,7 +61,21 @@ func NewForExpr(varName string, start, end, step, body Expr) *ForExpr {
 	}
 }
 
-// for let i = 0; i < 10; i = i + 1 { }
+type ForeachExpr struct {
+	BaseExpr
+	VarName string `json:"var_name"`
+	Array   Expr   `json:"array"`
+	Body    Expr   `json:"body"`
+}
+
+func NewForeachExpr(varName string, array, body Expr) *ForeachExpr {
+	return &ForeachExpr{
+		BaseExpr: BaseExpr{Type: EXPR_FOREACH},
+		VarName:  varName,
+		Array:    array,
+		Body:     body,
+	}
+}
 
 func (p *Parser) parseForExpr() (expr Expr) {
 	p.nextToken()
@@ -72,6 +86,14 @@ func (p *Parser) parseForExpr() (expr Expr) {
 		return expr
 	}
 
+	if p.peekExpect(1, lexer.TOKEN_IN) {
+		return p.parseForeachExpr()
+	} else {
+		return p.parseNormalForExpr()
+	}
+}
+
+func (p *Parser) parseNormalForExpr() (expr Expr) {
 	if p.getCurTok().Kind != lexer.TOKEN_VAR {
 		p.Err = cerr.NewParserError("Expected 'var' in for loop", p.getCurTok().Line, p.getCurTok().Location)
 		return nil
@@ -118,13 +140,43 @@ func (p *Parser) parseForExpr() (expr Expr) {
 
 	p.nextToken()
 
-	step := p.parseAssignExpr()
+	step := p.parseExpr()
 
 	p.nextToken()
 
 	body := p.parseBraceExpr()
 
 	expr = NewForExpr(varName, start, cond, step, body)
+
+	return expr
+}
+
+func (p *Parser) parseForeachExpr() (expr Expr) {
+
+	if p.getCurTok().Kind != lexer.TOKEN_NAME {
+		p.Err = cerr.NewParserError("Expected variable name in foreach loop", p.getCurTok().Line, p.getCurTok().Location)
+		return nil
+	}
+
+	varName := p.getCurTok().Literal
+	p.nextToken()
+
+	if p.getCurTok().Kind != lexer.TOKEN_IN {
+		p.Err = cerr.NewParserError("Expected 'in' in foreach loop", p.getCurTok().Line, p.getCurTok().Location)
+		return nil
+	}
+
+	p.nextToken()
+
+	array := p.parseExpr()
+	if array == nil {
+		p.Error("Expected array in foreach loop")
+		return nil
+	}
+
+	body := p.parseBraceExpr()
+
+	expr = NewForeachExpr(varName, array, body)
 
 	return expr
 }
