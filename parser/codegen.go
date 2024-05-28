@@ -111,7 +111,7 @@ func (n *ForExpr) Codegen() string {
 }
 
 func (n *ForeachExpr) Codegen() string {
-	return fmt.Sprintf("for (let %s in %s) { %s }", n.VarName, n.Array.Codegen(), n.Body.Codegen())
+	return fmt.Sprintf("for (let %s of %s) { %s }", n.VarName, n.Array.Codegen(), n.Body.Codegen())
 }
 
 func (n *AssignExpr) Codegen() string {
